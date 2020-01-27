@@ -14,8 +14,7 @@
 (defstruct automaton
            (rules (make-hash-table :test 'equal)))
 (defun get-rule(automaton name)
-  (gethash name (automaton-rules automaton))
-  )
+  (gethash name (automaton-rules automaton)))
 (defun compile-bot(rules)
   (let ((a (make-automaton)))
     (loop for i in rules
@@ -23,7 +22,7 @@
     a
     ))
 (defun run-rule(bot name)
-  (funcall (gethash name (automaton-rules bot)) bot (make-hash-table)))
+  (apply #'concatenate (cons 'string (alexandria:flatten (funcall (gethash name (automaton-rules bot)) bot (make-hash-table))))))
 
 (defun compile-rule(automaton body)
   (destructuring-bind (name body) body
@@ -34,13 +33,18 @@
 
 (defun compile-body(item)
   (if (stringp item)
-      item
+      (if (< 0 (length item))
+          (if (char= (char item 0) #\\ )
+              (subseq item 1)
+              (concatenate 'string " " item))
+          item)
       (case (car item)
-        (:seq (compile-sequence (cdr item)))
-        (:choice (compile-choice (cdr item)))
-        (:store (compile-store (cdr item)))
-        (:retrieve (compile-retrieve (cdr item)))
-        (:call (compile-call (cdr item)))
+        ((:s :seq) (compile-sequence (cdr item)))
+        ((:c :choice) (compile-choice (cdr item)))
+        ((:st :store) (compile-store (cdr item)))
+        ((:r :retrieve) (compile-retrieve (cdr item)))
+        ((:ca :call) (compile-call (cdr item)))
+        (t (error "Uknown body type ~a" (car item) ))
         ))
   )
 (defun compile-sequence(contents)
