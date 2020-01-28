@@ -1,3 +1,4 @@
+(in-package #:lisp-dfa-example)
 (defparameter *bot*
    (lisp-dfa-bot:compile-bot
     '(
@@ -56,7 +57,7 @@
       (preposition (:choice "before" "at" "upon"))
       (location (:seq (:call location-type) (:call location-suffix) (:choice "" (:seq (:call preposition) "the" (:call terrain)))))
       (arrival (:choice "stumble into" "come upon" "arrive at" (:seq "look" (:choice "upon" "at"))))
-      (actor-aggregate (:seq (:store actor-type (:choice "monk" "soldiers" "politician" "kid" "artisan" "smith" )) "\\s"))
+      (actor-aggregate (:seq (:store actor-type (:choice "monk" "soldier" "politician" "kid" "artisan" "smith" )) "\\s"))
       (action-aggregate (:choice (:seq "eating" (:choice "lunch" "dinner" "breakfast"))
                          "marching"
                          (:seq "milling-around" (:choice "" (:seq "and"
@@ -93,3 +94,9 @@
                      (:ca actor-single) (:ca action-single) "\\."))
       (total (:s "You" (:ca arrival) (:c "a" "the") (:ca location) "\\." (:ca action-total)))
       )))
+(defparameter *poster* (make-instance 'glacier:mastodon-bot :config-file "basic.config"))
+(defun run-bot()
+  (glacier:run-bot *poster*
+    (glacier:after-every (30 :minutes :run-immediately t)
+      (glacier:post (lisp-dfa-bot:run-rule *bot* 'total)
+                    ))))
