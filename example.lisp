@@ -50,7 +50,7 @@
                       ))
       (location-suffix (:choice "" (:seq "\\;" (:call location-name))))
       (temple (:choice "temple" "lamissary"))
-      (city-adjectives (:choice "" "dingy" "dirty" "immaculate" "clean" "poorly built" "well built" "shoddy" "stone"))
+      (city-adjectives (:choice "" "dingy" "dirty" "immaculate" "clean" "poorly built" "well built" "shoddy" "stone" "ruined" "silent"))
       (city (:seq (:call city-adjectives) (:choice "town" "capital")))
       (fortress (:choice "fort" "castle" "post" "citadel" "mesa"))
       (location-type (:choice (:call fortress) (:call city) (:call fortress)))
@@ -82,7 +82,8 @@
                                           "chirps contentedly"
                                           "scrawls illegible fortunes in the dirt"
                                           "lets out a belch of flame before dismantling itself")))))))
-      (action-gift-prefix (:c "says nothing and passes you a" "hands you a" "laughs and hands you a" "tosses you a"))
+      (action-gift-prefix (:c "says nothing and passes you a" "hands you a" "laughs and hands you a" "tosses you a"
+                           "gives you a :stuck_out_tongue_winking_eye: and hands you a"))
       (action-single (:c (:s "waves at you as you" (:c "approach" "pass"))
                        "offers you a meal"
                        (:s "gives you a" (:c "harsh" "curious") "look")
@@ -99,4 +100,5 @@
   (glacier:run-bot *poster*
     (glacier:after-every (30 :minutes :run-immediately t)
       (glacier:post (lisp-dfa-bot:run-rule *bot* 'total)
+                    :cw "Yet another text generator"
                     ))))
