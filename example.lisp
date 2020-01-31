@@ -50,7 +50,9 @@
                       ))
       (location-suffix (:choice "" (:seq "\\;" (:call location-name))))
       (temple (:choice "temple" "lamissary"))
-      (city-adjectives (:choice "" "dingy" "dirty" "immaculate" "clean" "poorly built" "well built" "shoddy" "stone" "ruined" "silent"))
+      (city-adjectives (:choice "" "dingy" "dirty" "immaculate" "clean"
+                        "poorly built" "well built" "shoddy" "stone"
+                        "ruined" "silent"))
       (city (:seq (:call city-adjectives) (:choice "town" "capital")))
       (fortress (:choice "fort" "castle" "post" "citadel" "mesa"))
       (location-type (:choice (:call fortress) (:call city) (:call fortress)))
