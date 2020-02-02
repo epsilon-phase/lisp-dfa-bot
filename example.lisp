@@ -98,9 +98,17 @@
       (total (:s "You" (:ca arrival) (:c "a" "the") (:ca location) "\\." (:ca action-total)))
       )))
 (defparameter *poster* (make-instance 'glacier:mastodon-bot :config-file "basic.config"))
+(defvar *current-thread*)
 (defun run-bot()
   (glacier:run-bot *poster*
-    (glacier:after-every (30 :minutes :run-immediately t)
+    (glacier:add-command "!help" (lambda(status)
+                                   (glacier:reply status "Commands:
+!help Show this help
+!list-rules Display rules that can be run.")))
+    (glacier:add-command "list-rules" (list-rules *bot*))
+    (loop for i being the hash-keys of (lisp-dfa-bot:automaton-rules *bot*)
+          do(glacier:add-command (format nil "~a" i) (rule-runner *bot* i)))
+    (glacier:after-every (30 :minutes :run-immediately t :async t)
       (glacier:post (lisp-dfa-bot:run-rule *bot* 'total)
                     :cw "Yet another text generator"
                     ))))

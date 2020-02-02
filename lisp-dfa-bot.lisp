@@ -71,4 +71,4 @@
     `(funcall (get-rule automaton ',name) automaton store)))
 
 
-(export '(compile-body compile-bot run-rule))
+(export '(compile-body compile-bot run-rule automaton-rules))

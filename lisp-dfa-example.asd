@@ -9,6 +9,7 @@
   :entry-point "lisp-dfa-example:run-bot"
   :depends-on ("lisp-dfa-bot" "glacier")
   :components ((:file "example-package")
+               (:file "bot-ware")
                (:file "example")))
 
 
