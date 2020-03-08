@@ -12,7 +12,8 @@
 |#
 
 (defstruct automaton
-           (rules (make-hash-table :test 'equal)))
+  (rules (make-hash-table :test 'equal))
+  (rules-raw (make-hash-table :test 'equal)))
 (defun get-rule(automaton name)
   (gethash name (automaton-rules automaton)))
 (defun compile-bot(rules)
@@ -29,7 +30,9 @@
       (setf (gethash name (automaton-rules automaton))
             (compile nil
                      `(lambda (automaton store)
-                        ,(compile-body body))))))
+                        ,(compile-body body)))
+            (gethash name (automaton-rules-raw automaton))
+            body)))
 
 (defun compile-body(item)
   (if (not (consp item))
@@ -71,4 +74,4 @@
     `(funcall (get-rule automaton ',name) automaton store)))
 
 
-(export '(compile-body compile-bot run-rule automaton-rules))
+(export '(compile-body compile-bot run-rule automaton-rules automaton-rules-raw))

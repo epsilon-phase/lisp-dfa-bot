@@ -84,7 +84,8 @@
                                           "chirps contentedly"
                                           "scrawls illegible fortunes in the dirt"
                                           "lets out a belch of flame before dismantling itself")))))))
-      (action-gift-prefix (:c "says nothing and passes you a" "hands you a" "laughs and hands you a" "tosses you a"
+      (action-gift-prefix (:c "says nothing and passes you a" "hands you a"
+                           "laughs and hands you a" "tosses you a"
                            "gives you a :stuck_out_tongue_winking_eye: and hands you a"))
       (action-single (:c (:s "waves at you as you" (:c "approach" "pass"))
                        "offers you a meal"
@@ -97,18 +98,23 @@
                      (:ca actor-single) (:ca action-single) "\\."))
       (total (:s "You" (:ca arrival) (:c "a" "the") (:ca location) "\\." (:ca action-total)))
       )))
-(defparameter *poster* (make-instance 'glacier:mastodon-bot :config-file "basic.config"))
+(defvar *poster* (make-instance 'glacier:mastodon-bot :config-file "basic.config"))
 (defvar *current-thread*)
 (defun run-bot()
-  (glacier:run-bot *poster*
-    (glacier:add-command "!help" (lambda(status)
-                                   (glacier:reply status "Commands:
-!help Show this help
-!list-rules Display rules that can be run.")))
-    (glacier:add-command "list-rules" (list-rules *bot*))
+  (glacier:run-bot (*poster*)
+    (glacier:add-command "help" #'show-help
+                         :add-prefix t)
+    (glacier:add-command "list-rules" (list-rules *bot*) :add-prefix t)
     (loop for i being the hash-keys of (lisp-dfa-bot:automaton-rules *bot*)
-          do(glacier:add-command (format nil "~a" i) (rule-runner *bot* i)))
-    (glacier:after-every (30 :minutes :run-immediately t :async t)
+          do(glacier:add-command (format nil "~a" i) (rule-runner *bot* i) :add-prefix t)
+          do(glacier:add-command (format nil "explain-~a" i)
+                                 (let ((rule i))
+                                   (lambda(status)
+                                   (glacier:reply status
+                                                  (format nil "~s" (gethash rule (lisp-dfa-bot:automaton-rules-raw *bot*)))
+                                                  :visibility (visibility-from status))))
+                                 :add-prefix t))
+    (glacier:after-every (30 :minutes)
       (glacier:post (lisp-dfa-bot:run-rule *bot* 'total)
                     :cw "Yet another text generator"
                     ))))
